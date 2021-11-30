@@ -1,5 +1,7 @@
 # 进入博客所在目录
 cd /home/zx/blog/myblog
+# 重置更改
+git reset --hard
 # 更新
 git pull
 # 由于国内网络问题，增加成功判定
