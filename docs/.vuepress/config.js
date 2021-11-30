@@ -1,1 +1,1 @@
-module.exports = { 	title: 'formatjn2019的博客', 	description: '博客', 	base: '/', 	themeConfig: { 	nav: [	{ 	text: 'LeetCode', 	link: '/LeetCode/' }], 	sidebar: 'auto', 	sidebarDepth: 2 } }
+module.exports = { 	title: 'formatjn2019的博客', 	description: '博客', 	base: '/', 	themeConfig: { 	nav: [	{ 	text: 'LeetCode', 	link: '/LeetCode/' },	{ 	text: '博客', 	link: '/博客/' }], 	sidebar: 'auto', 	sidebarDepth: 2 } }
