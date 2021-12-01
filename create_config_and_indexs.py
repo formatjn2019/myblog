@@ -19,6 +19,7 @@ BLOG_TITLE = "formatjn2019的博客"
 # 根路径 首文件夹名称
 def create_readme(root_path, head_name, web_path='/'):
     files = os.listdir(root_path)
+    files.sort()
     result_lines = []
     # 超链接格式模板
     modle = "+ "+"[{}]({})\n"
@@ -71,7 +72,9 @@ def create_configs(root_path, blog_title):
     config_dic["module.exports"] = module_exports
 
     # 为导航栏添加内容
-    for name in os.listdir(root_path):
+    contents =os.listdir(root_path)
+    contents.sort()
+    for name in contents :
         if os.path.isdir(root_path+os.sep+name) and MATCH_DIR_RULE.match(name):
             module_exports["themeConfig"]["nav"].append({"text": name, "link": '/'+name+'/'})
 
@@ -108,7 +111,7 @@ def _create_content(data):
         for item in data:
             items.append(_create_content(item))
         return "[\t{}]".format(",\t".join(items))
-    # 列表
+    # 数字
     elif type(data).__name__ == 'int':
         return data
     # 字符串
