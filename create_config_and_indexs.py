@@ -9,13 +9,13 @@ MATCH_DIR_RULE = re.compile(r"[^._].*")
 # 输入路径 python文件相对于docs的路径
 INPUT_PATH = r"./docs"
 # README.md
-TABLE_FLAG = "Mailto:formatjn2019@gmail.com"
+TABLE_FLAG = "  "
 
 # 站点配置
 # 博客名
 BLOG_TITLE = "formatjn2019的博客"
 # 邮箱
-MAIL = ""
+MAIL = "Mailto:formatjn2019@gmail.com"
 
 
 # 根路径 首文件夹名称
