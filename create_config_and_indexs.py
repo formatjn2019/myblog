@@ -77,8 +77,7 @@ def create_configs(root_path, blog_title):
     for name in contents :
         if os.path.isdir(root_path+os.sep+name) and MATCH_DIR_RULE.match(name):
             module_exports["themeConfig"]["nav"].append({"text": name, "link": '/'+name+'/'})
-    
-    module_exports["themeConfig"]["nav"].append({"text": "联系我", "link": 'Mailto:formatjn2019@gmail.com'})
+
 
     # 生成js配置文件内容
     content=_create_js_style_content(config_dic)
