@@ -9,11 +9,13 @@ MATCH_DIR_RULE = re.compile(r"[^._].*")
 # 输入路径 python文件相对于docs的路径
 INPUT_PATH = r"./docs"
 # README.md
-TABLE_FLAG = "  "
+TABLE_FLAG = "Mailto:formatjn2019@gmail.com"
 
 # 站点配置
 # 博客名
 BLOG_TITLE = "formatjn2019的博客"
+# 邮箱
+MAIL = ""
 
 
 # 根路径 首文件夹名称
@@ -22,9 +24,9 @@ def create_readme(root_path, head_name, web_path='/'):
     files.sort()
     result_lines = []
     # 超链接格式模板
-    modle = "+ "+"[{}]({})\n"
+    modle = "+ " + "[{}]({})\n"
     head = modle.format(head_name, web_path)
-    current_content =  head
+    current_content = head
     result_lines.append(head)
     for file_name in files:
         # 文件路径
@@ -51,6 +53,7 @@ def create_readme(root_path, head_name, web_path='/'):
         file.write(current_content)
     return result_lines
 
+
 # 博客配置创建
 # .vuepress/comfig.js
 # 根路径，博客名
@@ -63,51 +66,53 @@ def create_configs(root_path, blog_title):
         "description": "博客",
         "base": '/',
         "themeConfig": {
-            "nav": [ # 导航栏配置
+            "nav": [  # 导航栏配置
             ],
-            "sidebar": 'auto', # 侧边栏配置
-            "sidebarDepth": 2, # 侧边栏显示2级
+            "sidebar": 'auto',  # 侧边栏配置
+            "sidebarDepth": 2,  # 侧边栏显示2级
         }
     }
     config_dic["module.exports"] = module_exports
 
     # 为导航栏添加内容
-    contents =os.listdir(root_path)
+    contents = os.listdir(root_path)
     contents.sort()
-    for name in contents :
-        if os.path.isdir(root_path+os.sep+name) and MATCH_DIR_RULE.match(name):
-            module_exports["themeConfig"]["nav"].append({"text": name, "link": '/'+name+'/'})
+    for name in contents:
+        if os.path.isdir(root_path + os.sep + name) and MATCH_DIR_RULE.match(name):
+            module_exports["themeConfig"]["nav"].append({"text": name, "link": '/' + name + '/'})
 
+    module_exports["themeConfig"]["nav"].append({"text": "联系我", "link": MAIL})
 
     # 生成js配置文件内容
-    content=_create_js_style_content(config_dic)
+    content = _create_js_style_content(config_dic)
 
     # 写入文件
-    with open(root_path+"/.vuepress/config.js","w",encoding='utf-8') as f:
+    with open(root_path + "/.vuepress/config.js", "w", encoding='utf-8') as f:
         f.write(content)
 
 
 # 将python字典转换为js格式
 def _create_js_style_content(dict):
     template = "{} = {}\n"
-    content=""
+    content = ""
     for k, v in dict.items():
-        content+=template.format(k,_create_content(v))
+        content += template.format(k, _create_content(v))
 
     return content
+
 
 # 递归生成嵌套括号
 def _create_content(data):
     # 字典
     if type(data).__name__ == 'dict':
-        dict_temple="\t{}: {}"
-        items=[]
+        dict_temple = "\t{}: {}"
+        items = []
         for ki, vi in data.items():
             items.append(dict_temple.format(ki, _create_content(vi)))
         return "{{ {} }}".format(", ".join(items))
     # 列表
     elif type(data).__name__ == 'list':
-        items=[]
+        items = []
         for item in data:
             items.append(_create_content(item))
         return "[\t{}]".format(",\t".join(items))
@@ -119,12 +124,9 @@ def _create_content(data):
         return "'{}'".format(data)
 
 
-
-
 if __name__ == '__main__':
     # 相对路径转绝对路径
-    INPUT_PATH=os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]),INPUT_PATH))
+    INPUT_PATH = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), INPUT_PATH))
 
     create_readme(INPUT_PATH, BLOG_TITLE)
     create_configs(INPUT_PATH, BLOG_TITLE)
-
