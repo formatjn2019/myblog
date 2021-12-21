@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import functools
 
 # markdown文件匹配规则
 MATCH_FILE_RULE = re.compile(r"^(?!README).*\.md")
@@ -17,11 +18,25 @@ BLOG_TITLE = "formatjn2019的博客"
 # 邮箱
 MAIL = "Mailto:formatjn2019@gmail.com"
 
+# 文件夹文件数量统计
+def count_files(dir_path):
+    result=0
+    for name in os.listdir(dir_path):
+        path = dir_path+os.sep+name
+        if os.path.isdir(path) and MATCH_DIR_RULE.match(name):
+            result+=count_files(path)
+        if os.path.isfile(path) and MATCH_FILE_RULE.match(path):
+            result+=1
+    return result
 
 # 根路径 首文件夹名称
 def create_readme(root_path, head_name, web_path='/'):
     files = os.listdir(root_path)
-    files.sort()
+    if(web_path =='/'):
+        dir_files={name:count_files(root_path+os.sep+name) for name in os.listdir(root_path)}
+        files.sort(key=functools.cmp_to_key(lambda c1,c2:dir_files[c1]-dir_files[c2]))
+    else:
+        files.sort()
     result_lines = []
     # 超链接格式模板
     modle = "+ " + "[{}]({})\n"
@@ -127,6 +142,5 @@ def _create_content(data):
 if __name__ == '__main__':
     # 相对路径转绝对路径
     INPUT_PATH = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), INPUT_PATH))
-
     create_readme(INPUT_PATH, BLOG_TITLE)
     create_configs(INPUT_PATH, BLOG_TITLE)
