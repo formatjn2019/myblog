@@ -20,6 +20,8 @@ MAIL = "Mailto:formatjn2019@gmail.com"
 
 # 文件夹文件数量统计
 def count_files(dir_path):
+    if os.path.isfile(dir_path):
+        return MATCH_FILE_RULE.match(dir_path) and 1 or 0
     result=0
     for name in os.listdir(dir_path):
         path = dir_path+os.sep+name
