@@ -4,7 +4,7 @@ import sys
 import functools
 
 # markdown文件匹配规则
-MATCH_FILE_RULE = re.compile(r"^(?!README).*\.md")
+MATCH_FILE_RULE = re.compile(r"^(?!README).*\.md$")
 # 文件夹匹配规则
 MATCH_DIR_RULE = re.compile(r"[^._].*")
 # 输入路径 python文件相对于docs的路径
@@ -15,35 +15,67 @@ TABLE_FLAG = "  "
 # 站点配置
 # 博客名
 BLOG_TITLE = "formatjn2019的博客"
+# 博客副标题
+BLOG_SUBTITLE = "博客副标题"
+# 博客描述
+BLOG_DESCRIPTION = "博客"
+# Github连接
+GITHUB_LINK ="formatjn2019/myblog"
+
 # 邮箱
 MAIL = "Mailto:formatjn2019@gmail.com"
+#备案相关
+IPC="豫ICP备2021036468号"
+IPC_NUM="2021036468"
+BEIAN='豫公网安备 41022102001056号'
+# 首页YAML模板
+HOME_PAGE_MODLE = """---
+home: true
+heroImage: /logo.png
+heroText: {}
+tagline: {}
+actionText: 博客搭建 →
+actionLink: /博客搭建/
+features:
+- title: 记录
+  details: 归档，纪念，也许会用到的吧。
+- title: 点滴
+  details: 不是系统的长篇大论，只是点滴而已。
+- title: 心情
+  details: 分享内心感受。
+footer: 转载请注明原链接 [链接](www.baidu.com)
+---
+""".format(BLOG_TITLE,BLOG_SUBTITLE)
+
 
 # 文件夹文件数量统计
 def count_files(dir_path):
     if os.path.isfile(dir_path):
         return MATCH_FILE_RULE.match(dir_path) and 1 or 0
-    result=0
+    result = 0
     for name in os.listdir(dir_path):
-        path = dir_path+os.sep+name
+        path = dir_path + os.sep + name
         if os.path.isdir(path) and MATCH_DIR_RULE.match(name):
-            result+=count_files(path)
-        if os.path.isfile(path) and MATCH_FILE_RULE.match(path):
-            result+=1
+            result += count_files(path)
+        if os.path.isfile(path):
+            result += 1
     return result
 
+
 # 根路径 首文件夹名称
-def create_readme(root_path, head_name, web_path='/'):
+def create_readme(root_path, head_name, web_path='/',yaml_head=False):
+    current_content=""
     files = os.listdir(root_path)
-    if(web_path =='/'):
-        dir_files={name:count_files(root_path+os.sep+name) for name in os.listdir(root_path)}
-        files.sort(key=functools.cmp_to_key(lambda c1,c2:dir_files[c1]-dir_files[c2]))
+    if (web_path == '/'):
+        dir_files = {name: count_files(root_path + os.sep + name) for name in os.listdir(root_path)}
+        files.sort(key=functools.cmp_to_key(lambda c1, c2: dir_files[c1] - dir_files[c2]))
     else:
         files.sort()
     result_lines = []
     # 超链接格式模板
     modle = "+ " + "[{}]({})\n"
     head = modle.format(head_name, web_path)
-    current_content = head
+    current_content += head
     result_lines.append(head)
     for file_name in files:
         # 文件路径
@@ -64,25 +96,57 @@ def create_readme(root_path, head_name, web_path='/'):
             line = TABLE_FLAG + modle.format(file_name[:-3], url)
             result_lines.append(line)
             current_content += line
+    if yaml_head:
+        current_content = HOME_PAGE_MODLE
+
+    # 添加备案号链接
+    # 公安备案 IPC备案
+    current_content+="\n[{}](https://beian.miit.gov.cn)  [{}](https://beian.miit.gov.cn)".format(BEIAN,IPC,IPC_NUM)
+
+
     # 写入当前目录README.md
     with open(root_path + os.sep + "README.md", "w", encoding="utf-8") as file:
-        print(root_path)
         file.write(current_content)
     return result_lines
+
+# 侧边栏自动生成
+def create_sidebar_arr(root_path,web_path='/'):
+    result=[]
+    files = os.listdir(root_path)
+    files.sort()
+    for name in files:
+        path = root_path + os.sep + name
+        if os.path.isdir(path) and MATCH_DIR_RULE.match(name):
+            item={"title":name,"path":web_path+name+"/"}
+            item["children"]=create_sidebar_arr(path,web_path+name+"/")
+            result.append(item)
+        if os.path.isfile(path) and MATCH_FILE_RULE.match(name):
+            name = name[:-3]
+            result.append({"title":name,"path":web_path+name})
+    return result
+
 
 
 # 博客配置创建
 # .vuepress/comfig.js
 # 根路径，博客名
-def create_configs(root_path, blog_title):
+def create_configs(root_path, blog_title,auto_sidebar=False):
     # key,dic
     config_dic = {}
     # 模块导出设置
     module_exports = {
         "title": blog_title,
-        "description": "博客",
+        "description": BLOG_DESCRIPTION,
+        "head": [
+            # 收藏栏与新标签也图标
+            ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
+            ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
+        ],
         "base": '/',
         "themeConfig": {
+            # 导航栏图标
+            "logo": "/logo.png",
+            "repo": GITHUB_LINK,
             "nav": [  # 导航栏配置
             ],
             "sidebar": 'auto',  # 侧边栏配置
@@ -90,6 +154,8 @@ def create_configs(root_path, blog_title):
         }
     }
     config_dic["module.exports"] = module_exports
+    if not auto_sidebar:
+        config_dic["module.exports"]["themeConfig"]["sidebar"]=create_sidebar_arr(root_path)
 
     # 为导航栏添加内容
     contents = os.listdir(root_path)
@@ -144,5 +210,6 @@ def _create_content(data):
 if __name__ == '__main__':
     # 相对路径转绝对路径
     INPUT_PATH = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), INPUT_PATH))
-    create_readme(INPUT_PATH, BLOG_TITLE)
+    create_readme(INPUT_PATH, BLOG_TITLE,yaml_head=True)
     create_configs(INPUT_PATH, BLOG_TITLE)
+    # create_sidebar_arr(INPUT_PATH)
