@@ -8,7 +8,7 @@ MATCH_FILE_RULE = re.compile(r"^(?!README).*\.md$")
 # 文件夹匹配规则
 MATCH_DIR_RULE = re.compile(r"[^._].*")
 # 输入路径 python文件相对于docs的路径
-INPUT_PATH = r"./blog"
+INPUT_PATH = r"./docs"
 # README.md
 TABLE_FLAG = "  "
 
