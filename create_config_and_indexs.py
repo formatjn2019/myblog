@@ -27,8 +27,11 @@ MAIL = "Mailto:formatjn2019@gmail.com"
 #备案相关
 IPC="豫ICP备2021036468号"
 IPC_NUM="2021036468"
-BEIAN='豫公网安备 41022102001056号'
+
+BEIAN='豫公网安备41022102001056号'
+BEIAN_NUM='41022102001056'
 # 首页YAML模板
+
 HOME_PAGE_MODLE = """---
 home: true
 heroImage: /logo.png
@@ -43,9 +46,11 @@ features:
   details: 不是系统的长篇大论，只是点滴而已。
 - title: 心情
   details: 分享内心感受。
-footer: 欢迎转载，转载请注明原链接 | {} | {}
 ---
-""".format(BLOG_TITLE,BLOG_SUBTITLE,IPC,BEIAN)
+::: slot footer
+欢迎转载，转载请注明原链接 | [{}](http://beian.miit.gov.cn/) | [{}](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={})
+:::
+""".format(BLOG_TITLE,BLOG_SUBTITLE,IPC,BEIAN,BEIAN_NUM)
 
 
 # 文件夹文件数量统计
