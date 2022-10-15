@@ -14,46 +14,25 @@ TABLE_FLAG = "  "
 
 # 站点配置
 # 博客名
-BLOG_TITLE = "醉雪的点滴笔记"
+BLOG_TITLE = "formatjn2019的博客"
 # 博客副标题
-BLOG_SUBTITLE = "formatjn2019的博客"
+BLOG_SUBTITLE = "博客副标题"
 # 博客描述
 BLOG_DESCRIPTION = "博客"
 # Github连接
-GITHUB_LINK ="formatjn2019/myblog"
+GITHUB_LINK = "https://github.com/formatjn2019/myblog"
 
 # 邮箱
-MAIL = "Mailto:formatjn2019@gmail.com"
-#备案相关
-IPC="豫ICP备2021036468号"
-IPC_NUM="2021036468"
-
-BEIAN='豫公网安备41022102001056号'
-BEIAN_NUM='41022102001056'
-# 首页YAML模板
-
-HOME_PAGE_MODLE = """---
-home: true
-heroImage: /logo.png
-heroText: {}
-tagline: {}
-actionText: 博客搭建 →
-actionLink: /博客搭建/
-features:
-- title: 记录
-  details: 归档，纪念，也许会用到的吧。
-- title: 点滴
-  details: 不是系统的长篇大论，只是点滴而已。
-- title: 心情
-  details: 分享内心感受。
----
-::: slot footer
-欢迎转载，转载请注明原链接 | [{}](http://beian.miit.gov.cn/) | [{}](http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={})
-:::
-""".format(BLOG_TITLE,BLOG_SUBTITLE,IPC,BEIAN,BEIAN_NUM)
-
+MAIL = "mailto:formatjn2019@gmail.com"
+# 备案相关
+IPC = "豫ICP备2021036468号"
+BEIAN = '豫公网安备 41022102001056号'
+BEIAN_NUM = "41022102001056"
+LINK = 'https://beian.miit.gov.cn/'
 
 # 文件夹文件数量统计
+
+
 def count_files(dir_path):
     if os.path.isfile(dir_path):
         return MATCH_FILE_RULE.match(dir_path) and 1 or 0
@@ -68,12 +47,14 @@ def count_files(dir_path):
 
 
 # 根路径 首文件夹名称
-def create_readme(root_path, head_name, web_path='/',yaml_head=False):
-    current_content=""
+def create_readme(root_path, head_name, web_path='/'):
+    current_content = ""
     files = os.listdir(root_path)
     if (web_path == '/'):
-        dir_files = {name: count_files(root_path + os.sep + name) for name in os.listdir(root_path)}
-        files.sort(key=functools.cmp_to_key(lambda c1, c2: dir_files[c1] - dir_files[c2]))
+        dir_files = {name: count_files(root_path + os.sep + name)
+                     for name in os.listdir(root_path)}
+        files.sort(key=functools.cmp_to_key(
+            lambda c1, c2: dir_files[c1] - dir_files[c2]))
     else:
         files.sort()
     result_lines = []
@@ -89,7 +70,8 @@ def create_readme(root_path, head_name, web_path='/',yaml_head=False):
         if os.path.isdir(file_path) and MATCH_DIR_RULE.match(file_name):
             print("扫描到文件夹:" + file_path)
             # 将子目录的条目添加到当前目录
-            sub_lines = create_readme(file_path, file_name, web_path=web_path + file_name + '/')
+            sub_lines = create_readme(
+                file_path, file_name, web_path=web_path + file_name + '/')
             for line in sub_lines:
                 line = TABLE_FLAG + line
                 current_content += line
@@ -101,41 +83,173 @@ def create_readme(root_path, head_name, web_path='/',yaml_head=False):
             line = TABLE_FLAG + modle.format(file_name[:-3], url)
             result_lines.append(line)
             current_content += line
-    if yaml_head:
-        current_content = HOME_PAGE_MODLE
-
-    # # 添加备案号链接
-    # # 公安备案 IPC备案
-    # current_content+="\n[{}](https://beian.miit.gov.cn)  [{}](https://beian.miit.gov.cn)".format(BEIAN,IPC,IPC_NUM)
-
 
     # 写入当前目录README.md
     with open(root_path + os.sep + "README.md", "w", encoding="utf-8") as file:
         file.write(current_content)
     return result_lines
 
+
 # 侧边栏自动生成
-def create_sidebar_arr(root_path,web_path='/'):
-    result=[]
+def create_sidebar_arr(root_path, web_path='/'):
+    result = []
     files = os.listdir(root_path)
     files.sort()
     for name in files:
         path = root_path + os.sep + name
         if os.path.isdir(path) and MATCH_DIR_RULE.match(name):
-            item={"title":name,"path":web_path+name+"/"}
-            item["children"]=create_sidebar_arr(path,web_path+name+"/")
+            item = {"title": name, "path": web_path + name + "/"}
+            item["children"] = create_sidebar_arr(path, web_path + name + "/")
             result.append(item)
         if os.path.isfile(path) and MATCH_FILE_RULE.match(name):
             name = name[:-3]
-            result.append({"title":name,"path":web_path+name})
+            result.append({"title": name, "path": web_path + name})
     return result
 
+
+'''
+module.exports = {
+    title: 'VuePress Blog Example', // Title for the site. This will be displayed in the navbar.
+    theme: '@vuepress/theme-blog',
+    plugins: [
+        [
+            '@vuepress/blog',
+            {
+                directories: [
+                    {
+                        // 当前分类的唯一 ID
+                        id: 'post',
+                        // 目标文件夹
+                        dirname: '_posts',
+                        // `entry page` (或者 `list page`) 的路径
+                        path: '/',
+                        // itemPermalink: '/post/:year/:month/:day/:slug',
+                    },
+                ],
+            },
+        ],
+    ],
+    themeConfig: {
+       
+        nav: [
+            {
+                text: 'Blog',
+                link: '/',
+            },
+            {
+                text: 'Tags',
+                link: '/tag/',
+            },
+            {
+                text: 'test',
+                link: '/tag/',
+            },
+        ],
+        footer: {
+            contact: [
+                {
+                    type: 'github',
+                    link: 'https://github.com/vuejs/vuepress',
+                },
+            ],
+            copyright: [
+                {
+                    text: 'Privacy Policy',
+                    link: 'https://policies.google.com/privacy?hl=en-US',
+                },
+                {
+                    text: 'MIT Licensed | Copyright © 2018-present Vue.js',
+                },
+            ],
+        },
+    }
+}
+'''
 
 
 # 博客配置创建
 # .vuepress/comfig.js
 # 根路径，博客名
-def create_configs(root_path, blog_title,auto_sidebar=False):
+def create_configs(root_path, blog_title, auto_sidebar=False):
+    # key,dic
+    config_dic = {}
+    # 模块导出设置
+    module_exports = {
+        "title": blog_title,
+        "theme": '@vuepress/theme-blog',
+        "description": BLOG_DESCRIPTION,
+        "head": [
+            # # 收藏栏与新标签页图标
+            # ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
+            # ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
+        ],
+        "plugins": [
+            [
+                '@vuepress/blog',
+            ],
+        ],
+        "base": '/',
+        "themeConfig": {
+            # 导航栏图标
+            "logo": "/logo.png",
+            "repo": GITHUB_LINK,
+            "nav": [  # 导航栏配置
+            ],
+            "sitemap": {
+                "hostname": "http://blog.zuixue.site"
+            },
+            "footer": {
+                "contact": [
+                    {
+                        "type": 'github',
+                        "link": GITHUB_LINK,
+                    },
+                    {
+                        "type": 'mail',
+                        "link": MAIL,
+                    },
+                ],
+                "copyright": [
+                    {
+                        "text": IPC,
+                        "link": LINK,
+                    },
+                    {
+                        "text": BEIAN,
+                        "link": "http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={}".format(BEIAN_NUM),
+                    },
+                    {
+                        "text": '欢迎转载，转载请注明出处',
+                    },
+                ],
+            },
+            "sidebar": 'auto',  # 侧边栏配置
+            "sidebarDepth": 2,  # 侧边栏显示2级
+        }
+    }
+    config_dic["module.exports"] = module_exports
+    # if not auto_sidebar:
+    #     config_dic["module.exports"]["themeConfig"]["sidebar"] = create_sidebar_arr(root_path)
+
+    # 为导航栏添加内容
+    contents = os.listdir(root_path)
+    contents.sort()
+    for name in contents:
+        if os.path.isdir(root_path + os.sep + name) and MATCH_DIR_RULE.match(name):
+            module_exports["themeConfig"]["nav"].append(
+                {"text": name, "link": '/' + name + '/'})
+
+    module_exports["themeConfig"]["nav"].append({"text": "联系我", "link": MAIL})
+
+    # 生成js配置文件内容
+    content = _create_js_style_content(config_dic)
+
+    # 写入文件
+    with open(root_path + "/.vuepress/config.js", "w", encoding='utf-8') as f:
+        f.write(content)
+
+
+def create_configs_old(root_path, blog_title, auto_sidebar=False):
     # key,dic
     config_dic = {}
     # 模块导出设置
@@ -154,20 +268,23 @@ def create_configs(root_path, blog_title,auto_sidebar=False):
             "repo": GITHUB_LINK,
             "nav": [  # 导航栏配置
             ],
+
             "sidebar": 'auto',  # 侧边栏配置
             "sidebarDepth": 2,  # 侧边栏显示2级
         }
     }
     config_dic["module.exports"] = module_exports
     if not auto_sidebar:
-        config_dic["module.exports"]["themeConfig"]["sidebar"]=create_sidebar_arr(root_path)
+        config_dic["module.exports"]["themeConfig"]["sidebar"] = create_sidebar_arr(
+            root_path)
 
     # 为导航栏添加内容
     contents = os.listdir(root_path)
     contents.sort()
     for name in contents:
         if os.path.isdir(root_path + os.sep + name) and MATCH_DIR_RULE.match(name):
-            module_exports["themeConfig"]["nav"].append({"text": name, "link": '/' + name + '/'})
+            module_exports["themeConfig"]["nav"].append(
+                {"text": name, "link": '/' + name + '/'})
 
     module_exports["themeConfig"]["nav"].append({"text": "联系我", "link": MAIL})
 
@@ -207,6 +324,9 @@ def _create_content(data):
     # 数字
     elif type(data).__name__ == 'int':
         return data
+    # 数字
+    elif type(data).__name__ == 'bool':
+        return data and 'true' or 'false'
     # 字符串
     else:
         return "'{}'".format(data)
@@ -214,7 +334,8 @@ def _create_content(data):
 
 if __name__ == '__main__':
     # 相对路径转绝对路径
-    INPUT_PATH = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), INPUT_PATH))
-    create_readme(INPUT_PATH, BLOG_TITLE,yaml_head=True)
+    INPUT_PATH = os.path.abspath(os.path.join(
+        os.path.dirname(sys.argv[0]), INPUT_PATH))
+    create_readme(INPUT_PATH, BLOG_TITLE)
     create_configs(INPUT_PATH, BLOG_TITLE)
     # create_sidebar_arr(INPUT_PATH)
