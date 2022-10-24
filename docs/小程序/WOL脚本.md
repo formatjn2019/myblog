@@ -36,7 +36,7 @@ MAC_REGULAR=re.compile(r"^[A-F0-9]{12}$")
 # wake on lan
 def wake_on_lan(mac,port):
     mac,port=check_args(mac,port)
-    data="F"*12+mac*14
+    data="F"*12+mac*16
     send_data = binascii.unhexlify(data)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
