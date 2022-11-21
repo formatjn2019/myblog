@@ -30,6 +30,7 @@ BEIAN = '豫公网安备 41022102001056号'
 BEIAN_NUM = "41022102001056"
 LINK = 'https://beian.miit.gov.cn/'
 
+
 # 文件夹文件数量统计
 
 
@@ -49,8 +50,12 @@ def count_files(dir_path):
 # 根路径 首文件夹名称
 def create_readme(root_path, head_name, web_path='/'):
     current_content = ""
+    # 读取原本 READEME 内容
+    if os.path.exists(os.path.join(root_path, "README.md")):
+        with open(os.path.join(root_path, "README.md"), "r", encoding="utf-8") as file:
+            current_content = file.read()+"\n"
     files = os.listdir(root_path)
-    if (web_path == '/'):
+    if web_path == '/':
         dir_files = {name: count_files(root_path + os.sep + name)
                      for name in os.listdir(root_path)}
         files.sort(key=functools.cmp_to_key(
@@ -98,8 +103,11 @@ def create_sidebar_arr(root_path, web_path='/'):
     for name in files:
         path = root_path + os.sep + name
         if os.path.isdir(path) and MATCH_DIR_RULE.match(name):
-            item = {"title": name, "path": web_path + name + "/"}
-            item["children"] = create_sidebar_arr(path, web_path + name + "/")
+            item = {
+                "title": name,
+                "path": web_path + name + "/",
+                "children": create_sidebar_arr(path, web_path + name + "/")
+            }
             result.append(item)
         if os.path.isfile(path) and MATCH_FILE_RULE.match(name):
             name = name[:-3]
@@ -130,7 +138,7 @@ module.exports = {
         ],
     ],
     themeConfig: {
-       
+
         nav: [
             {
                 text: 'Blog',
@@ -228,55 +236,8 @@ def create_configs(root_path, blog_title, auto_sidebar=False):
         }
     }
     config_dic["module.exports"] = module_exports
-    # if not auto_sidebar:
-    #     config_dic["module.exports"]["themeConfig"]["sidebar"] = create_sidebar_arr(root_path)
-
-    # 为导航栏添加内容
-    contents = os.listdir(root_path)
-    contents.sort()
-    for name in contents:
-        if os.path.isdir(root_path + os.sep + name) and MATCH_DIR_RULE.match(name):
-            module_exports["themeConfig"]["nav"].append(
-                {"text": name, "link": '/' + name + '/'})
-
-    module_exports["themeConfig"]["nav"].append({"text": "联系我", "link": MAIL})
-
-    # 生成js配置文件内容
-    content = _create_js_style_content(config_dic)
-
-    # 写入文件
-    with open(root_path + "/.vuepress/config.js", "w", encoding='utf-8') as f:
-        f.write(content)
-
-
-def create_configs_old(root_path, blog_title, auto_sidebar=False):
-    # key,dic
-    config_dic = {}
-    # 模块导出设置
-    module_exports = {
-        "title": blog_title,
-        "description": BLOG_DESCRIPTION,
-        "head": [
-            # 收藏栏与新标签也图标
-            ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
-            ['link', {"rel": 'icon', "type": "image/png", "href": '/logo.png'}],
-        ],
-        "base": '/',
-        "themeConfig": {
-            # 导航栏图标
-            "logo": "/logo.png",
-            "repo": GITHUB_LINK,
-            "nav": [  # 导航栏配置
-            ],
-
-            "sidebar": 'auto',  # 侧边栏配置
-            "sidebarDepth": 2,  # 侧边栏显示2级
-        }
-    }
-    config_dic["module.exports"] = module_exports
     if not auto_sidebar:
-        config_dic["module.exports"]["themeConfig"]["sidebar"] = create_sidebar_arr(
-            root_path)
+        config_dic["module.exports"]["themeConfig"]["sidebar"] = create_sidebar_arr(root_path)
 
     # 为导航栏添加内容
     contents = os.listdir(root_path)
@@ -294,6 +255,8 @@ def create_configs_old(root_path, blog_title, auto_sidebar=False):
     # 写入文件
     with open(root_path + "/.vuepress/config.js", "w", encoding='utf-8') as f:
         f.write(content)
+
+
 
 
 # 将python字典转换为js格式
