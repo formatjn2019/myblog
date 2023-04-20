@@ -1,7 +1,9 @@
+BLOG_PATH=/home/zx/blog/myblog
+
 # 进入博客所在目录
-cd /home/zx/blog/myblog
+cd $BLOG_PATH
 # 删除自动生成的READEME.md
-find /home/zx/blog/myblog -name "README.md" | xargs rm -f
+find $BLOG_PATH -name "README.md" -delete
 # 重置更改
 git reset --hard
 # 更新
