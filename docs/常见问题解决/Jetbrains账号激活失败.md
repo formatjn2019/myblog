@@ -1,4 +1,4 @@
-Jetbrains 账号激活失败
+Jetbrains账号激活失败
 
 #### 激活页面提示
 Authorization Failed You can close this page and return to the IDE
