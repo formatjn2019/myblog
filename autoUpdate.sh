@@ -5,7 +5,8 @@ cd $BLOG_PATH
 # 删除自动生成的READEME.md
 find $BLOG_PATH -name "README.md" -delete
 # 重置更改
-git reset --hard
+# git reset --hard
+git checkout .
 # 更新
 git pull
 # 重新生成readme和config文件
