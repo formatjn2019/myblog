@@ -1,6 +1,6 @@
-剑指Offer47.礼物的最大价值（中等）
+剑指Offer47.礼物的最大价值
 
-[剑指Offer47.礼物的最大价值（中等）](https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof/)
+[剑指Offer47.礼物的最大价值](https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof/)
 
 
 

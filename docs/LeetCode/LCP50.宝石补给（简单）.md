@@ -1,6 +1,6 @@
-LCP50.宝石补给（简单）
+LCP50.宝石补给
 
-[LCP50.宝石补给（简单）](https://leetcode.cn/problems/WHnhjV/)
+[LCP50.宝石补给](https://leetcode.cn/problems/WHnhjV/)
 
 
 

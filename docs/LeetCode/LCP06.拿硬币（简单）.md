@@ -1,6 +1,6 @@
-LCP06.拿硬币（简单）
+LCP06.拿硬币
 
-[LCP06.拿硬币（简单）](https://leetcode.cn/problems/na-ying-bi/)
+[LCP06.拿硬币](https://leetcode.cn/problems/na-ying-bi/)
 
 
 

@@ -1,6 +1,6 @@
-LCP41.黑白翻转棋（中等）
+LCP41.黑白翻转棋
 
-[LCP41.黑白翻转棋（中等）](https://leetcode.cn/problems/fHi6rV/)
+[LCP41.黑白翻转棋](https://leetcode.cn/problems/fHi6rV/)
 
 
 
