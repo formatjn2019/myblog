@@ -48,13 +48,17 @@ def count_files(dir_path):
 
 
 # 根路径 首文件夹名称
-def create_readme(root_path, head_name, web_path='/'):
+def create_readme(root_path, head_name, web_path='/', replace_index=False):
     current_content = ""
     # 读取原本 READEME 内容
     if os.path.exists(os.path.join(root_path, "README.md")):
         with open(os.path.join(root_path, "README.md"), "r", encoding="utf-8") as file:
-            current_content = file.read()+"\n"
+            current_content = file.read() + "\n"
+    else:
+        # 不存在README文件时自动开始替换标志
+        replace_index = True
     files = os.listdir(root_path)
+    # 文件名倒序排列
     if web_path == '/':
         dir_files = {name: count_files(root_path + os.sep + name)
                      for name in os.listdir(root_path)}
@@ -76,7 +80,7 @@ def create_readme(root_path, head_name, web_path='/'):
             print("扫描到文件夹:" + file_path)
             # 将子目录的条目添加到当前目录
             sub_lines = create_readme(
-                file_path, file_name, web_path=web_path + file_name + '/')
+                file_path, file_name, web_path=web_path + file_name + '/', replace_index=True)
             for line in sub_lines:
                 line = TABLE_FLAG + line
                 current_content += line
@@ -90,8 +94,10 @@ def create_readme(root_path, head_name, web_path='/'):
             current_content += line
 
     # 写入当前目录README.md
-    with open(root_path + os.sep + "README.md", "w", encoding="utf-8") as file:
-        file.write(current_content)
+    # 如README文件存在且替换标志为False 则不进行首页内容替换
+    if not web_path == '/' or replace_index:
+        with open(root_path + os.sep + "README.md", "w", encoding="utf-8") as file:
+            file.write(current_content)
     return result_lines
 
 
@@ -255,8 +261,6 @@ def create_configs(root_path, blog_title, auto_sidebar=False):
     # 写入文件
     with open(root_path + "/.vuepress/config.js", "w", encoding='utf-8') as f:
         f.write(content)
-
-
 
 
 # 将python字典转换为js格式
