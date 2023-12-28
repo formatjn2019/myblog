@@ -3,6 +3,8 @@ import re
 import sys
 import functools
 
+import git
+
 # markdown文件匹配规则
 MATCH_FILE_RULE = re.compile(r"^(?!README).*\.md$")
 # 文件夹匹配规则
@@ -11,6 +13,13 @@ MATCH_DIR_RULE = re.compile(r"[^._].*")
 INPUT_PATH = r"./docs"
 # README.md
 TABLE_FLAG = "  "
+
+# 近期文件限制
+RECENT_FILE = 10
+# 包含新增文件
+ADD_FILE_FLAG = True
+# 包含更新文件
+UPDATE_FILE_FLAG = True
 
 # 站点配置
 # 博客名
@@ -264,17 +273,17 @@ def create_configs(root_path, blog_title, auto_sidebar=False):
 
 
 # 将python字典转换为js格式
-def _create_js_style_content(dict):
+def _create_js_style_content(dic: dict):
     template = "{} = {}\n"
     content = ""
-    for k, v in dict.items():
+    for k, v in dic.items():
         content += template.format(k, _create_content(v))
 
     return content
 
 
 # 递归生成嵌套括号
-def _create_content(data):
+def _create_content(data: any):
     # 字典
     if type(data).__name__ == 'dict':
         dict_temple = "\t{}: {}"
@@ -299,10 +308,49 @@ def _create_content(data):
         return "'{}'".format(data)
 
 
+# 近期更新
+def recent_update_file(limit: int, add_flag: bool, update_flag: bool) -> dict:
+    repo = git.Repo(".")
+    all_commit = list(repo.iter_commits(all=True))
+    result = {"add": [], "update": []}
+    for commit in all_commit:
+        # 获取最后一次提交涉及的文件列表
+        add_list, update_list = [], []
+        files = [(item.a_path, item.change_type) for item in commit.diff(None) if item.a_path]
+        for (file_path, change_type) in files:
+            if MATCH_FILE_RULE.match(file_path):
+                if add_flag and change_type == 'A':
+                    add_list.append(file_path)
+                if update_flag and change_type == 'M':
+                    update_list.append(file_path)
+        if len(add_list) + len(update_list) < limit:
+            result["add"] = add_list
+            result["update"] = update_list
+        else:
+            break
+    return result
+
+# 添加近期更新文件
+def update_index(path:str):
+    context = ""
+    with open(path + os.sep + "README.md", "r", encoding="utf8") as f:
+        context += f.read()
+
+    file_dic = recent_update_file(RECENT_FILE, ADD_FILE_FLAG, UPDATE_FILE_FLAG)
+    for key, title in {"add": "\n#### 近期新增\n", "update": "\n#### 近期修改\n"}.items():
+        context += title
+        for file in file_dic[key]:
+            link = "[{}]({})\n".format(file[file.rfind("/") + 1:-3], file[file.find("/"):])
+            context += link
+    with open(INPUT_PATH + os.sep + "README.md", "w", encoding="utf8") as f:
+        f.write(context)
+
 if __name__ == '__main__':
     # 相对路径转绝对路径
     INPUT_PATH = os.path.abspath(os.path.join(
         os.path.dirname(sys.argv[0]), INPUT_PATH))
+
     create_readme(INPUT_PATH, BLOG_TITLE)
     create_configs(INPUT_PATH, BLOG_TITLE)
-    # create_sidebar_arr(INPUT_PATH)
+    create_sidebar_arr(INPUT_PATH)
+    update_index(INPUT_PATH)

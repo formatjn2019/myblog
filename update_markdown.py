@@ -4,7 +4,7 @@ import re
 MATCH_RULE = re.compile("^(.*)-\d(.md)$")
 
 
-def traverse_folder(folder_path):
+def scane_duplicate(folder_path):
     replace_dic = {}
     for root, dirs, files in os.walk(folder_path):
         for file_name in files:
@@ -29,4 +29,4 @@ def traverse_folder(folder_path):
 
 
 if __name__ == '__main__':
-    traverse_folder(r".")
+    scane_duplicate(r".")
