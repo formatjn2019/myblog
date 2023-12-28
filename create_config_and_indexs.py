@@ -340,7 +340,7 @@ def update_index(path:str):
     for key, title in {"add": "\n#### 近期新增\n", "update": "\n#### 近期修改\n"}.items():
         context += title
         for file in file_dic[key]:
-            link = "[{}]({})\n".format(file[file.rfind("/") + 1:-3], file[file.find("/"):])
+            link = "[{}]({})\n\n".format(file[file.rfind("/") + 1:-3], file[file.find("/"):])
             context += link
     with open(INPUT_PATH + os.sep + "README.md", "w", encoding="utf8") as f:
         f.write(context)
