@@ -318,7 +318,7 @@ def recent_update_file(limit: int, add_flag: bool, update_flag: bool) -> dict:
         add_list, update_list = [], []
         files = [(item.a_path, item.change_type) for item in commit.diff(None) if item.a_path]
         for (file_path, change_type) in files:
-            if MATCH_FILE_RULE.match(file_path):
+            if file_path.endswith(".md") and not file_path.endswith("README.md"):
                 if add_flag and change_type == 'A':
                     add_list.append(file_path)
                 if update_flag and change_type == 'M':
@@ -330,8 +330,9 @@ def recent_update_file(limit: int, add_flag: bool, update_flag: bool) -> dict:
             break
     return result
 
+
 # 添加近期更新文件
-def update_index(path:str):
+def update_index(path: str):
     context = ""
     with open(path + os.sep + "README.md", "r", encoding="utf8") as f:
         context += f.read()
@@ -344,6 +345,7 @@ def update_index(path:str):
             context += link
     with open(INPUT_PATH + os.sep + "README.md", "w", encoding="utf8") as f:
         f.write(context)
+
 
 if __name__ == '__main__':
     # 相对路径转绝对路径
